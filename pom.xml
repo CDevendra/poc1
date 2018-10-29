@@ -79,7 +79,7 @@
 	
 	<properties>
 		<cglib.version>2.2.2</cglib.version>
-		<spring.version>4.3.11.RELEASE</spring.version>
+		<spring.version>5.0.7.RELEASE</spring.version>
 	</properties>
 
 	<build>
