@@ -7,6 +7,7 @@ import java.util.Random;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -22,7 +23,8 @@ import com.poc1.domain.Product;
 public class ProductServiceImpl implements ProductService {
 
 	private JdbcTemplate jdbcTemplate;
-
+	private static final Logger LOG = Logger.getLogger(ProductServiceImpl.class);
+	 
 	public ProductServiceImpl(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
@@ -35,10 +37,13 @@ public class ProductServiceImpl implements ProductService {
 			String sql = "UPDATE product SET productName=?, productPrice=?, productDesc=? WHERE productId=?";
 			jdbcTemplate.update(sql, product.getProductName(), product.getProductPrice(), product.getProductDesc(),
 					product.getProductId());
+
+			LOG.info("Update Successfull. : "+sql);
 		} else {
 			// insert
 			String sql = "INSERT INTO product (productName, productPrice, productDesc)" + " VALUES (?, ?, ?)";
 			jdbcTemplate.update(sql, product.getProductName(), product.getProductPrice(), product.getProductDesc());
+			LOG.info("Insert Successfully. : " +sql);
 		}
 	}
 
@@ -56,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
 					product.setProductName(rs.getString("productName"));
 					product.setProductPrice(rs.getString("productPrice"));
 					product.setProductDesc(rs.getString("productDesc"));
+					LOG.info("SQL : " + sql);
 					return product;
 				}
 
@@ -68,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
 	public void delete(int id) {
 		String sql = "DELETE FROM product WHERE productId = ?";
 		jdbcTemplate.update(sql, id);
-		System.out.println("Deleted Record with ID = " + id );
+		LOG.info("Deleted Record with ID = " + id );
 	}
 
 	@Override
@@ -82,17 +88,13 @@ public class ProductServiceImpl implements ProductService {
 				aProduct.setProductId(rs.getInt("productId"));
 				aProduct.setProductName(rs.getString("productName"));
 				aProduct.setProductPrice(rs.getString("productPrice"));
-				aProduct.setProductDesc(rs.getString("productDesc"));				
+				aProduct.setProductDesc(rs.getString("productDesc"));	
+				LOG.info("SQL : " + sql);
 				return aProduct;
 			}			
 		});		
 		return listProduct;
 	}
-	
-	/*@Override
-	public void update(int id) {
-		String sql = "UPDATE------ product WHERE productId=?";
-		jdbcTemplate.update(sql, id);
-	}*/
+
 
 }
