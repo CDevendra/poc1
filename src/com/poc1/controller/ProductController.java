@@ -1,20 +1,20 @@
 package com.poc1.controller;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.poc1.dao.ProductService;
 import com.poc1.domain.Product;
@@ -56,6 +56,14 @@ public class ProductController {
 	@RequestMapping(value="/listproduct", method=RequestMethod.GET)
 	public List<Product> list() {
 		return productService.list();
+	}
+	
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+	public @ResponseBody String getFileContain(HttpServletRequest request,
+											   @RequestParam("file") MultipartFile multiPartFile) 
+													   throws FileNotFoundException, IOException{
+		String result = productService.upload(multiPartFile);		
+		return result;
 	}
 		
 }

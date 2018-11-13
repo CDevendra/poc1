@@ -1,7 +1,11 @@
 package com.poc1.service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Random;
 
@@ -13,6 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,16 +39,16 @@ public class ProductServiceImpl implements ProductService {
 
 		if (product.getProductId() > 0) {
 			// update
-			String sql = "UPDATE product SET productName=?, productPrice=?, productDesc=? WHERE productId=?";
+			String sql = "UPDATE product SET productName=?, productPrice=?, productDesc=?, productImagePath=? WHERE productId=?";
 			jdbcTemplate.update(sql, product.getProductName(), product.getProductPrice(), product.getProductDesc(),
 					product.getProductId());
 
 			LOG.info("Update Successfull. : "+sql);
 		} else {
-			// insert
-			String sql = "INSERT INTO product (productName, productPrice, productDesc)" + " VALUES (?, ?, ?)";
-			jdbcTemplate.update(sql, product.getProductName(), product.getProductPrice(), product.getProductDesc());
-			LOG.info("Insert Successfully. : " +sql);
+			// insert			
+				String sql = "INSERT INTO product (productName, productPrice, productDesc, productImagePath)" + " VALUES (?, ?, ?, ?)";
+				jdbcTemplate.update(sql, product.getProductName(), product.getProductPrice(), product.getProductDesc(), product.getProductImagePath());
+				LOG.info("Insert Successfully. : " +sql);
 		}
 	}
 
@@ -94,6 +99,19 @@ public class ProductServiceImpl implements ProductService {
 			}			
 		});		
 		return listProduct;
+	}
+
+	public String upload(MultipartFile multiPartFile) throws FileNotFoundException, IOException{
+		
+		String filename1 = multiPartFile.getOriginalFilename();
+		String directoryPath = Helper.getFileDirectoryByFileType();
+		String location = directoryPath + "/" + filename1;
+		File dest = new File(location);
+		
+		multiPartFile.transferTo(dest);
+		LOG.info("File uploaded : " + dest.getAbsolutePath());		
+		return dest.getAbsolutePath();
+		
 	}
 
 

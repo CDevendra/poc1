@@ -7,6 +7,7 @@ public class Product {
     private String productName;
     private String productPrice;
     private String productDesc;
+    private String productImagePath;
     
 	public int getProductId() {
 		return productId;
@@ -31,11 +32,17 @@ public class Product {
 	}
 	public void setProductDesc(String productDesc) {
 		this.productDesc = productDesc;
+	}	
+	public String getProductImagePath() {
+		return productImagePath;
+	}
+	public void setProductImagePath(String productImagePath) {
+		this.productImagePath = productImagePath;
 	}
 	@Override
 	public String toString() {
 		return "Product [productId=" + productId + ", productName=" + productName + ", productPrice=" + productPrice
-				+ ", productDesc=" + productDesc + "]";
+				+ ", productDesc=" + productDesc + ", productImagePath=" + productImagePath + "]";
 	}
     
     

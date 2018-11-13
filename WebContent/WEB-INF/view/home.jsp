@@ -51,60 +51,44 @@
 			
 			<label for="ageInput">Description: </label>
 			<input type="text" name="desc" id="descInput" value='d'/>
-			<br/>
+			<br/><br />
+			
+			<div id="path">
+				<span id="result"></span>
+			</div>
 			
 			<input type="submit" value="Save Person" /><br/><br/>
-			<div id="personFormResponse" class="green"> </div>
+			<div id="personFormResponse" class="green"> </div>			
 		</form>
-	</div>
 	
+        <h3>Upload Single File</h3>
+        <form method="POST" enctype="multipart/form-data" id="fileUploadForm">
+		    <input type="text" name="extraField"/><br/><br/>
+		    <input type="file" name="file"/><br/><br/>
+		    <input type="file" name="file"/><br/><br/>
+		    <input type="submit" value="Submit" id="btnSubmit"/>
+		</form>
+		
+		<h1>Ajax Post Result</h1>
+		<pre>
+		    <span id="result"></span>
+		</pre>
 	
 	<script type="text/javascript">
 	
 		$(document).ready(function() {
-			
-			// Random Person AJAX Request
-			//$('#randomPerson').click(function() {
-			//	$.getJSON('${pageContext.request.contextPath}/product/person/random', function(person) {
-			//		$('#personResponse').text(person.name + ', age ' + person.age);
-			//	});
-			//});
-			
-			// Request Person by ID AJAX
-			/* $('#idForm').submit(function(e) {
-				var personId = +$('#personId').val();
-				if(!validatePersonId(personId)) 
-					return false;
-				$.get('${pageContext.request.contextPath}/product/person/' + personId, function(person) {
-					$('#personIdResponse').text(person.name + ', age ' + person.age);
-				});
-				e.preventDefault(); // prevent actual form submit
-			}); */
-			
-			// Save Person AJAX Form Submit
-			//$('#randomPerson').click(function() {
-			//	$.getJSON('${pageContext.request.contextPath}/product/person/random', function(person) {
-			//		$('#personResponse').text(person.name + ', age ' + person.age);
-			//	});
-			//});
-			
-	
-			
-			
 			$('#newPersonForm').submit(function(e) {
 				debugger
-				// will pass the form date using the jQuery serialize function
-				//$.post('${pageContext.request.contextPath}/product/saveproduct', $(this).serialize(), function(response) {
-				//	$("{'#personFormResponse'}").text(response);
-				//});
 				 var obj = {};
 				 obj.productName = $("#nameInput").val();
 				 obj.productPrice = $("#priceInput").val();
 				 obj.productDesc = $("#descInput").val();
+				 obj.productImagePath = $("#path span").text();
+				 
 				 var settings = {
 						  "async": true,
 						  "crossDomain": true,
-						  "url": "http://localhost:8080/product/saveproduct",
+						  "url": "/product/saveproduct",
 						  "method": "POST",
 						  "headers": {
 						    "content-type": "application/json",
@@ -120,23 +104,54 @@
 				
 			});
 			
+			
+			$("#btnSubmit").click(function (event) {
+
+		        //stop submit the form, we will post it manually.
+		        event.preventDefault();
+
+		        fire_ajax_submit();
+
+		    });
+			function fire_ajax_submit() {
+				// Get form
+			    var form = $('#fileUploadForm')[0];
+
+			    var data = new FormData(form);
+
+			    data.append("CustomField", "This is some extra data, testing");
+
+			    $("#btnSubmit").prop("disabled", true);
+
+			    $.ajax({
+			        type: "POST",
+			        enctype: 'multipart/form-data',
+			        url: "/product/upload",
+			        data: data,
+			        //http://api.jquery.com/jQuery.ajax/
+			        //https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+			        processData: false, //prevent jQuery from automatically transforming the data into a query string
+			        contentType: false,
+			        cache: false,
+			        timeout: 600000,
+			        success: function (data) {
+			            $("#result").text(data);
+			            console.log("SUCCESS : ", data);
+			            $("#btnSubmit").prop("disabled", false);
+			        },
+			        error: function (e) {
+			            $("#result").text(e.responseText);
+			            console.log("ERROR : ", e);
+			            $("#btnSubmit").prop("disabled", false);
+			        }
+			    });
+			}		
+			
+			
+			
 		});
 		
-		/* function validatePersonId(personId) {
-			console.log(personId);
-			if(personId === undefined || personId < 0 || personId > 3) {
-				$('#idError').show();
-				return false;
-			}
-			else {
-				$('#idError').hide();
-				return true;
-			}
-		} */
-		
-		
-		
-		
+			
 		
 		
 	</script>

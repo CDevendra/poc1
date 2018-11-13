@@ -1,11 +1,15 @@
 package com.poc1.springconfig;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -13,21 +17,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import com.poc1.service.Helper;
+
 
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages="com.poc1")
 public class WebConfig implements WebMvcConfigurer  {
 
-	/**
-	 * Since we don't have any controller logic, simpler to just
-	 * define controller for page using View Controller. Note:
-	 * had to extend WebMvcConfigurerAdapter to get this functionality
-	 * @param registry
-	 */
+	private int maxUploadSizeInMb = 10 * 1024 * 1024; // 10 MB
+	
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addViewController("/poc1/").setViewName("home");
+		registry.addViewController("/").setViewName("home");
 	}
 	
 	@Bean
@@ -44,19 +46,24 @@ public class WebConfig implements WebMvcConfigurer  {
 	}
 
 	@Bean
-	public DataSource getDataSource() {
+	public DataSource getDataSource() throws FileNotFoundException, IOException {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-		dataSource.setUrl("jdbc:mysql://localhost:3306/dentalDb");
-		dataSource.setUsername("inferyx");
-		dataSource.setPassword("inferyx");
+		dataSource.setDriverClassName(Helper.getDbProperties("driver"));
+		dataSource.setUrl(Helper.getDbProperties("url"));
+		dataSource.setUsername(Helper.getDbProperties("user"));
+		dataSource.setPassword(Helper.getDbProperties("password"));
 		
 		return dataSource;
 	}
 	
-	/*@Bean
-	public ContactDAO getContactDAO() {
-		return new ContactDAOImpl(getDataSource());
-	}*/
+	@Bean
+    public CommonsMultipartResolver multipartResolver() {
+
+        CommonsMultipartResolver cmr = new CommonsMultipartResolver();
+        cmr.setMaxUploadSize(maxUploadSizeInMb * 2);
+        cmr.setMaxUploadSizePerFile(maxUploadSizeInMb); //bytes
+        return cmr;
+
+	}
 	
 }
